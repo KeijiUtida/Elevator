@@ -1,4 +1,4 @@
-"D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\src\system_TM4C1294_TW.c"
+"D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\TivaWare_C_Series-2.1.4.178\utils\uartstdio.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
@@ -7,11 +7,11 @@
 D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\src\UART_Config.h
 -MD
 -MF
-D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\Debug\BrowseInfo\system_TM4C1294_TW.pbi.dep
+D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\Debug\BrowseInfo\uartstdio.pbi.dep
 -o
-D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\Debug\BrowseInfo\system_TM4C1294_TW.pbi
+D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\Debug\BrowseInfo\uartstdio.pbi
 -I
-D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\src
+D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\TivaWare_C_Series-2.1.4.178\utils
 -I
 D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\..\drivers
 -I

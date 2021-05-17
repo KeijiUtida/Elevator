@@ -4,7 +4,7 @@
 -fbracket-depth=512
 -funsigned-char
 -include
-D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\..\..\Projects\elevator\src\UART_Config.h
+D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\src\UART_Config.h
 -MD
 -MF
 D:\WorkSpace\Embarcados\Projects\EK-TM4C1294_RTOS_IAR8\Projects\elevator\Debug\BrowseInfo\rtx_lib.pbi.dep
