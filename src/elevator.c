@@ -10,16 +10,18 @@
 #include "driverlib/pin_map.h"
 #include "utils/uartstdio.h"
 #include "system_TM4C1294.h"
-
+#include "ListaInt.h"
 // UART definitions
 extern void UARTStdioIntHandler(void);
 
 //threads
 osThreadId_t thread1_id, thread2_id, thread3_id, thread5_id;
 
+struct ListaInt *listElevator1 = NULL;
+struct ListaInt *listElevator2 = NULL;
+struct ListaInt *listElevator3 = NULL;
 //queue elevator
 int queue_elevator1_max = 10;
-
 
 bool readUARTBuffer = false;
 
@@ -42,23 +44,17 @@ uint8_t queue_elevator1_size = 10;
 uint8_t queue_elevator2_size = 10;
 uint8_t queue_elevator3_size = 10;
 
-uint8_t queue_elevator1_count =0;
-uint8_t queue_elevator2_count =0;
-uint8_t queue_elevator3_count =0;
-
-osMessageQueueId_t elevator1_queue;
-osMessageQueueId_t elevator2_queue;
-osMessageQueueId_t elevator3_queue;
-
-
+uint8_t queue_elevator1_count = 0;
+uint8_t queue_elevator2_count = 0;
+uint8_t queue_elevator3_count = 0;
 
 
 void sendComand(uint8_t floor_called, char elevator, uint8_t floor_now)
 {
   char message = 'f';
-  if (floor_called!=floor_now)                               // verifica se o elevador chamado não esta no mesmo andar
-  {
-    UARTprintf("%s%s",elevator,message);//fecha a porta do elevador
+    if (floor_called!=floor_now)                                //Verifica se o elevador chamado não esta no mesmo andar
+    {
+    UARTprintf("%s%s",elevator,message);                        //Fecha a porta do elevador
     if (floor_called>floor_now)
       message = 's';
     else
@@ -69,39 +65,154 @@ void sendComand(uint8_t floor_called, char elevator, uint8_t floor_now)
 }
 
 
-void thread1(void *arg)                        //Controla o elevador 1
+void thread1(void *arg)                                           //Controla o elevador 1
 {
-  uint8_t count_queue = 0;
+  uint8_t listSize= 0;
   while(1)
   {
-      uint8_t msg;
-      count_queue = osMessageQueueGetCount(elevator1_queue);
-      if (elevator1_moving == false && count_queue != 0)
+      listSize = tamanho(listElevator1);
+      if (elevator1_moving == false && listSize > 0) // se o elevador nao esta andando eu tenho que mandar comando para andar
       {
-        osMessageQueueGet(elevator1_queue, &msg, NULL, 0U);
+        int removePos(listElevator1, 0)
+
         sendComand(msg, 'e', elevator1_floor);
         elevator1_moving = true;
       }
   }     
 } // thread1
 
-void sendCommandToElevatorQueueQueueExternal( void *command, uint8_t elevator_number)
+
+
+
+
+void getCommand()
 {
-  char *receiveCommand;
-  receiveCommand = command;
-  uint8_t floor;
-  if (*receiveCommand == 'I')
+  int floor = 0;
+  bool isCommand = false;
+  char receiveCode[5];
+  UARTgets(receiveCode,6);
+  UARTFlushRx();
+  switch (receiveCode[1])
   {
+    //Recebimento de andar atual
+    case '1':
+    switch (receiveCode[2])
+    {
+        case NULL:
+          floor=1;
+        break;
+        case '0':
+          floor=10;
+        break;
+        case '1':
+          floor=11;
+        break;
+        case '2':
+          floor=12;
+        break;
+        case '3':
+          floor=13;
+        break;
+        case '4':
+          floor=14;
+        break;
+        case '5':
+          floor=15;
+    }
+    break;
+    case '2':
+      floor=2;
+    break;
+    case '3':
+      floor=3;
+    break;
+    case '4':
+      floor=4;
+    break;
+    case '5':
+      floor=5;
+    break;
+    case '6':
+      floor=6;
+    break;
+    case '7':
+      floor=7;
+    break;
+    case '8':
+      floor=8;
+    break;
+    case '9':
+      floor=9;
+    break;
+    //Recebimento de andar atual
     
-  }
-}
-void sendCommandToElevatorQueueInternal( void *command, uint8_t elevator_number)
-{
-  char *receiveCommand;
-  receiveCommand = command;
-  uint8_t floor;
-  switch (*receiveCommand)
-  {
+    
+    //recebimento de comando do botão extern0
+    case 'E':
+    switch (receiveCode[2])
+    {
+          case '0':
+          switch (receiveCode[3])
+          {
+            case '1':
+            floor = 1;
+            break;
+            case '2':
+              floor = 2;
+            break;
+            case '3':
+              floor = 3;
+            break;
+            case '4':
+              floor = 4;
+            break;
+            case '5':
+              floor = 5;
+            break;
+            case '6':
+              floor = 6;
+            break;
+            case '7':
+              floor = 7;
+            break;
+            case '8':
+              floor = 8;
+            break;
+            case '9':
+              floor = 9;
+            break;
+          }
+          break;
+          case '1':
+          switch (receiveCode[3])
+          {
+            case '0':
+            floor = 10;
+            case '1':
+            floor = 11;
+            break;
+            case '2':
+            floor = 12;
+            break;
+            case '3':
+            floor = 13;
+            break;
+            case '4':
+            floor = 14;
+            break;
+            case '5':
+            floor = 15;
+            break;
+          }
+          
+   }
+   //fim - Recebimento do botao externo
+   //Recebimento do botao interno
+    break;
+    case 'I':
+    isCommand = true;
+    switch (receiveCode[2])
+    {
           case 'a':
             floor = 1;
           break;
@@ -146,84 +257,43 @@ void sendCommandToElevatorQueueInternal( void *command, uint8_t elevator_number)
           break;
           case 'p':
             floor = 15;
-   } // end of switch
-   //PushToList()
-}
-
-void secondCharacter(void *command, uint8_t elevator_number)
-{
-  char *receiveCommand;
-  receiveCommand = command;
-  if (*receiveCommand == 'I')
-  {
-      sendCommandToElevatorQueueInternal(receiveCommand+0x1, elevator_number);
-  }
-  else
-  {
-    if(*receiveCommand == 'E')
-    {
-      //sendCommandToElevatorQueueExternal(receiveCommand+0x1, elevator_number);
     }
+    break;
+    if (isCommand==false)
+      switch (receiveCode[0])
+      {
+            case 'e':
+            elevator1_floor = floor;
+            break;
+            case 'c':
+            elevator2_floor = floor;
+            break;
+            case 'd':
+            elevator3_floor = floor;
+            break;
+      }   
     else
     {
-      switch (*receiveCommand)
+      char sentido = 'I';
+      if (receiveCode[1] == 'E')
+        sentido = receiveCode[4];
+      switch (receiveCode[0])
       {
-        case '0':
-          //verifica se tem que parar
-        break;
-        case '1':
-          //verifica se tem que parar
-        break;
-        case '2':
-        break;
-        case '3':
-        break;
-        case '4':
-        break;
-        case '5':
-        break;
-        case '6':
-        break;
-        case '7':
-        break;
-        case '8':
-        break;
-        case '9':
-        break;
-      }
+            case 'e':
+            insert(&listElevator1,floor, sentido);
+            break;
+            case 'c':
+            insert(&listElevator2,floor, sentido);
+            break;
+            case 'd':
+            insert(&listElevator3,floor, sentido);
+            break;
+      }    
     }
   }
- // int floor = 5;
-  //osMessageQueueGet(elevator1_queue, &floor, NULL, 0U);
 }
 
-
-
-void decodeCommand(void *command)
-{
-  char *receiveCommand;
-  receiveCommand = command;
-  switch (*receiveCommand)
-  {
-    case 'e':
-    secondCharacter(receiveCommand +0x1, 1);
-    break;
-    case 'c':
-    break;
-    case 'd':
-    break;
-  }
-}
-
-void getCommand()
-{
-  char receiveCode[5];
-  UARTgets(receiveCode,6);
-  UARTFlushRx();
-  decodeCommand(&receiveCode);
-}
-
-void thread5(void *arg)                        //Controla o elevador 1
+void thread5(void *arg)                        //Controla a leutura da uart que foi passada para uma thread
 {
   while(1)
   {
@@ -269,9 +339,6 @@ void main(void){
   UARTInit();
   osKernelInitialize();
 
-  elevator1_queue = osMessageQueueNew(queue_elevator1_count, queue_elevator1_size, NULL);
-  elevator2_queue = osMessageQueueNew(queue_elevator2_count, queue_elevator2_size, NULL);
-  elevator3_queue = osMessageQueueNew(queue_elevator3_count, queue_elevator3_size, NULL);
   //char receiveCode[5] = {'e','s'};
   //decodeCommand(receiveCode);
   
