@@ -56,32 +56,44 @@ int getPos(ListaInt *lista, int posicao)
     return andarilho->valor;
 }
 
-int searchValueAndRemove(ListaInt **lista, int value, char sentido)
+int searchValueAndRemove(ListaInt **lista, int value, char sentido, int sizelist)
 {
     int posicao;
     ListaInt *andarilho = *lista;
-    while (andarilho->proximo!= NULL)
-    {      
-            if (andarilho->valor == value && (andarilho->sentido == sentido || sentido == 'i'))
-            {
-                  int i;
-                  ListaInt *excluido;
-                  if (posicao == 0)
-                  {
-                    ListaInt *excluido = *lista;
-                    *lista = (*lista)->proximo;
-                    free(excluido);
-                  }
-                  ListaInt *andarilho = *lista;
-                  for (i=0; i<posicao; i++)
-                  andarilho = andarilho->proximo;
-                  excluido=andarilho->proximo;
-                  andarilho->proximo = andarilho->proximo->proximo;
-                  free(excluido);
-                  return 1;
-            }
-            andarilho = andarilho->proximo;
-            posicao++;   
+    if (sizelist == 1)
+    {
+      if(andarilho->valor == value)
+      {
+        if ((andarilho->sentido == sentido) || (sentido == 'i'))
+        {
+           *lista = NULL;
+           return 1;
+        }
+      }
+    }
+    else
+    {
+      while (andarilho->proximo!= NULL)
+      {      
+         if (andarilho->valor == value && (andarilho->sentido == sentido || sentido == 'i'))
+         {
+             int i;
+             ListaInt *excluido;
+             if (posicao == 0)
+             {
+                ListaInt *excluido = *lista;
+                *lista = (*lista)->proximo;
+             }
+              ListaInt *andarilho = *lista;
+              for (i=0; i<posicao; i++)
+              andarilho = andarilho->proximo;
+              excluido=andarilho->proximo;
+              andarilho->proximo = andarilho->proximo->proximo;
+              return 1;
+          }
+        andarilho = andarilho->proximo;
+        posicao++;   
+      }
     }
     return 0;
 }
@@ -95,22 +107,26 @@ int searchValueAndRemove(ListaInt **lista, int value, char sentido)
 int removePos(ListaInt **lista, int posicao)
 {
     int i;
+    int valorRemovido = -1;
     ListaInt *excluido;
     if (posicao == 0)
     {
          ListaInt *excluido = *lista;
-        *lista = (*lista)->proximo;
-         free(excluido);
+         valorRemovido = excluido->valor;
+         if((*lista)->proximo != NULL)
+             *lista = (*lista)->proximo;
+         else
+            *lista = NULL;
     }
-    ListaInt *andarilho = *lista;
-
-    for (i=0; i<posicao; i++)
-        andarilho = andarilho->proximo;
-    excluido=andarilho->proximo;
-    andarilho->proximo = andarilho->proximo->proximo;
-    free(excluido);
-
-    return 0;
+    else
+    {
+      ListaInt *andarilho = *lista;
+      for (i=0; i<posicao; i++)
+          andarilho = andarilho->proximo;
+      excluido=andarilho->proximo;
+      valorRemovido = excluido->valor;
+    }
+    return valorRemovido;
 }
 
 /**
@@ -120,7 +136,7 @@ int removePos(ListaInt **lista, int posicao)
  */
 int tamanho(ListaInt *lista)
 {
-    int contador;
+    int contador = 0;
     ListaInt *andarilho = lista;
     while (andarilho!= NULL)
     {

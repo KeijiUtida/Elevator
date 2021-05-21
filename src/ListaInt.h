@@ -11,7 +11,7 @@ typedef struct ListaInt
 
 /*funcoes basicas*/
 int insert(ListaInt **lista, int valor,  char sentido);
-int searchValueAndRemove(ListaInt **lista, int value, char sentido);
+int searchValueAndRemove(ListaInt **lista, int value, char sentido, int listSize);
 int get(ListaInt *lista, int posicao);
 int tamanho(ListaInt *lista);
 
